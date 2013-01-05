@@ -13,6 +13,10 @@ module Cequel
       configure(configuration)
     end
 
+    def name
+      @keyspace
+    end
+
     def connection=(connection)
       @connection = connection
     end
@@ -24,6 +28,10 @@ module Cequel
       @keyspace = configuration[:keyspace]
       # reset the connections
       clear_active_connections!
+    end
+
+    def schema
+      Schema.new(self)
     end
 
     def logger=(logger)

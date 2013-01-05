@@ -74,8 +74,13 @@ module Cequel
         @changed_columns.each do |column|
           updates[column] = serialize_value(@row[column])
         end
-        scope.update(updates) if updates.any?
-        scope.delete(*@deleted_columns.to_a) if @deleted_columns.any?
+        batch_size = self.class.default_batch_size
+        updates.each_slice(default_batch_size) do |slice|
+          scope.update(Hash[slice])
+        end
+        @deleted_columns.each_slice(default_batch_size) do |slice|
+          scope.delete(*slice)
+        end
         @changed_columns.clear
         @deleted_columns.clear
         self
