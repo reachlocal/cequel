@@ -70,9 +70,16 @@ module Cequel
       end
 
       def save
-        updates = {}
-        @changed_columns.each do |column|
-          updates[column] = serialize_value(@row[column])
+        batch_size = self.class.default_batch_size
+        @changed_columns.each_slice(batch_size) do |slice|
+          updates = {}
+          slice.each do |column|
+            updates[column] = serialize_value(@row[column])
+          end
+          scope.update(updates) if updates.any?
+        end
+        @deleted_columns.each_slice(batch_size) do |slice|
+          scope.delete(*slice.to_a) if slice.any?
         end
         batch_size = self.class.default_batch_size
         updates.each_slice(default_batch_size) do |slice|
