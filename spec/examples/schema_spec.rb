@@ -10,6 +10,10 @@ describe Cequel::Schema do
         end
       end
 
+      after do
+        cequel.schema.drop_table(:posts)
+      end
+
       it 'should create key alias' do
         columnfamilies['posts']['key_aliases'].should == %w(permalink).to_json
       end
@@ -24,7 +28,7 @@ describe Cequel::Schema do
   def columnfamilies
     columnfamilies = cequel.execute("SELECT * FROM system.schema_columnfamilies WHERE keyspace_name = cequel_test")
     {}.tap do |map|
-      columns.first.to_hash.except('keyspace_name').each_pair do |column, value|
+      columnfamilies.first.to_hash.except('keyspace_name').each_pair do |column, value|
         unpack_composite_column!(map, column, value)
       end
     end
@@ -40,7 +44,7 @@ describe Cequel::Schema do
   end
 
   def unpack_composite_column!(map, column, value)
-    components = column.scan(/\x00.(.+?)\x00/).map(&:first)
+    components = column.scan(/\x00.(.+?)\x00/m).map(&:first)
     last_component = components.pop
     components.each do |component|
       map[component] ||= {}

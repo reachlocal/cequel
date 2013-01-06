@@ -3,11 +3,23 @@ module Cequel
   module SpecSupport
 
     module Helpers
-      def cequel
+      def self.cequel
         @cequel ||= Cequel.connect(
-          :host => 'localhost:9162',
-          :keyspace => 'cequel_test'
+          :host => host,
+          :keyspace => keyspace_name
         )
+      end
+
+      def self.host
+        ENV['CEQUEL_TEST_HOST'] || '127.0.0.1:9162'
+      end
+
+      def self.keyspace_name
+        ENV['CEQUEL_TEST_KEYSPACE'] || 'cequel_test'
+      end
+
+      def cequel
+        Helpers.cequel
       end
     end
 
