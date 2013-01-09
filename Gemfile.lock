@@ -8,6 +8,13 @@ PATH
       connection_pool (~> 0.9.2)
       i18n
 
+PATH
+  remote: ../cassandra-cql
+  specs:
+    cassandra-cql (1.1.4)
+      simple_uuid (>= 0.2.0)
+      thrift_client (>= 0.7.1)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -18,9 +25,6 @@ GEM
       i18n (~> 0.6)
       multi_json (~> 1.0)
     builder (3.0.4)
-    cassandra-cql (1.1.4)
-      simple_uuid (>= 0.2.0)
-      thrift_client (>= 0.7.1)
     columnize (0.3.6)
     connection_pool (0.9.3)
     debugger (1.2.2)
@@ -69,6 +73,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  cassandra-cql!
   cequel!
   debugger
   geminabox

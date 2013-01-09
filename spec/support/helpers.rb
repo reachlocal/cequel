@@ -11,7 +11,7 @@ module Cequel
       end
 
       def self.host
-        ENV['CEQUEL_TEST_HOST'] || '127.0.0.1:9162'
+        ENV['CEQUEL_TEST_HOST'] || '127.0.0.1:9160'
       end
 
       def self.keyspace_name

@@ -154,7 +154,8 @@ module Cequel
     private
 
     def build_connection
-      options = @keyspace ? {:keyspace => @keyspace } : {}
+      options = {:cql_version => '3.0.0'}
+      options[:keyspace] = @keyspace if @keyspace
       CassandraCQL::Database.new(
         @hosts,
         options,

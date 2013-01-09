@@ -22,16 +22,21 @@ module Cequel
     end
 
     def create_cql
-      "CREATE TABLE #{@name} (#{columns_cql})"
+      "CREATE TABLE #{@name} (#{key_columns_cql}, #{columns_cql}, #{keys_cql})"
     end
 
     private
 
     def columns_cql
-      key = @keys.first #XXX handle composite keys
-      key_columns_cql = "#{key.name} #{key.type} PRIMARY KEY"
-      columns_cql = @columns.map { |key| "#{key.name} #{key.type}" }.join(', ')
-      "#{key_columns_cql}, #{columns_cql}"
+      @columns.map { |key| "#{key.name} #{key.type}" }.join(', ')
+    end
+
+    def key_columns_cql
+      @keys.map { |key| "#{key.name} #{key.type}" }.join(', ')
+    end
+
+    def keys_cql
+      "PRIMARY KEY (#{@keys.map { |key| key.name }.join(', ')})"
     end
 
   end

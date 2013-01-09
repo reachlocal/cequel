@@ -1,5 +1,5 @@
 require 'active_support/core_ext'
-require 'cassandra-cql'
+require 'cassandra-cql/1.2'
 require 'connection_pool'
 
 require 'cequel/batch'
