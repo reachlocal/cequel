@@ -31,7 +31,7 @@ module Cequel
     end
 
     def schema
-      Schema.new(self)
+      Schema::Keyspace.new(self)
     end
 
     def logger=(logger)

@@ -1,6 +1,6 @@
 module Cequel
 
-  class TableColumn
+  class Column
 
     attr_reader :name, :type
 

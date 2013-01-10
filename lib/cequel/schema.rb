@@ -1,21 +1,9 @@
+require 'cequel/schema/keyspace'
+require 'cequel/schema/table'
+require 'cequel/schema/table_dsl'
+require 'cequel/schema/column'
+
 module Cequel
-
-  class Schema
-
-    def initialize(keyspace)
-      @keyspace = keyspace
-    end
-
-    def create_table(name, &block)
-      table = TableDefinition.new(name)
-      TableDefinitionDSL.apply(table, &block)
-      @keyspace.execute(table.create_cql)
-    end
-
-    def drop_table(name)
-      @keyspace.execute("DROP TABLE #{name}")
-    end
-
+  module Schema
   end
-
 end
