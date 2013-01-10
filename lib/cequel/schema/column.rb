@@ -4,8 +4,12 @@ module Cequel
 
     attr_reader :name, :type
 
-    def initialize(name, type)
-      @name, @type = name, type
+    def initialize(name, type, key = nil)
+      @name, @type, @key = name, type, key
+    end
+
+    def key?
+      !!@key
     end
 
   end

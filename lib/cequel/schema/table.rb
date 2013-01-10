@@ -15,7 +15,7 @@ module Cequel
       end
 
       def add_key(name, type)
-        @keys << Column.new(name, type)
+        @columns << Column.new(name, type, true)
       end
 
       def add_column(name, type)
@@ -23,7 +23,7 @@ module Cequel
       end
 
       def create_cql
-        "CREATE TABLE #{@name} (#{key_columns_cql}, #{columns_cql}, #{keys_cql})"
+        "CREATE TABLE #{@name} (#{columns_cql}, #{keys_cql})"
       end
 
       private
@@ -37,7 +37,8 @@ module Cequel
       end
 
       def keys_cql
-        "PRIMARY KEY (#{@keys.map { |key| key.name }.join(', ')})"
+        key_columns = @columns.select { |column| column.key? }
+        "PRIMARY KEY (#{key_columns.map { |key| key.name }.join(', ')})"
       end
 
     end
