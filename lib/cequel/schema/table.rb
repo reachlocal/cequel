@@ -33,6 +33,18 @@ module Cequel
         @columns << Column.new(name, type)
       end
 
+      def add_list(name, type)
+        @columns << List.new(name, type)
+      end
+
+      def add_set(name, type)
+        @columns << Set.new(name, type)
+      end
+
+      def add_map(name, key_type, value_type)
+        @columns << Map.new(name, key_type, value_type)
+      end
+
       def create_cql
         "CREATE TABLE #{@name} (#{columns_cql}, #{keys_cql})"
       end
@@ -40,7 +52,7 @@ module Cequel
       private
 
       def columns_cql
-        @columns.map { |key| "#{key.name} #{key.type}" }.join(', ')
+        @columns.map(&:to_cql).join(', ')
       end
 
       def key_columns_cql

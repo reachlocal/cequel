@@ -115,6 +115,33 @@ describe Cequel::Schema do
       end
     end
 
+    describe 'collection types' do
+      before do
+        cequel.schema.create_table(:posts) do
+          key :permalink, :ascii
+          column :title, :text
+          list :authors, :blob
+          set :tags, :text
+          map :trackbacks, :timestamp, :ascii
+        end
+      end
+
+      it 'should create list' do
+        column('posts', 'authors')['validator'].should ==
+          'org.apache.cassandra.db.marshal.ListType(org.apache.cassandra.db.marshal.BytesType)'
+      end
+
+      it 'should create set' do
+        column('posts', 'tags')['validator'].should ==
+          'org.apache.cassandra.db.marshal.SetType(org.apache.cassandra.db.marshal.UTF8Type)'
+      end
+
+      it 'should create map' do
+        column('posts', 'trackbacks')['validator'].should ==
+          'org.apache.cassandra.db.marshal.MapType(org.apache.cassandra.db.marshal.DateType,org.apache.cassandra.db.marshal.AsciiType)'
+      end
+    end
+
   end
 
   def column_family(name)

@@ -25,6 +25,18 @@ module Cequel
         @table.add_column(name, type)
       end
 
+      def list(name, type)
+        @table.add_list(name, type)
+      end
+
+      def set(name, type)
+        @table.add_set(name, type)
+      end
+
+      def map(name, key_type, value_type)
+        @table.add_map(name, key_type, value_type)
+      end
+
     end
 
   end
