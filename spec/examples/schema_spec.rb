@@ -62,6 +62,59 @@ describe Cequel::Schema do
       end
     end
 
+    describe 'with composite partition key' do
+      before do
+        cequel.schema.create_table(:posts) do
+          key :blog_subdomain, :ascii, :partition => true
+          key :permalink, :ascii, :partition => true
+          column :title, :text
+        end
+      end
+
+      it 'should create all partition key components' do
+        column_family('posts')['key_aliases'].
+          should == %w(blog_subdomain permalink).to_json
+      end
+
+      it 'should set key validators' do
+        column_family('posts')['key_validator'].should ==
+          'org.apache.cassandra.db.marshal.CompositeType(org.apache.cassandra.db.marshal.AsciiType,org.apache.cassandra.db.marshal.AsciiType)'
+      end
+    end
+
+    describe 'with composite partition key and non-partition keys' do
+      before do
+        cequel.schema.create_table(:posts) do
+          key :blog_subdomain, :ascii, :partition => true
+          key :permalink, :ascii, :partition => true
+          key :month, :timestamp
+          column :title, :text
+        end
+      end
+
+      it 'should create all partition key components' do
+        column_family('posts')['key_aliases'].
+          should == %w(blog_subdomain permalink).to_json
+      end
+
+      it 'should set key validators' do
+        column_family('posts')['key_validator'].should ==
+          'org.apache.cassandra.db.marshal.CompositeType(org.apache.cassandra.db.marshal.AsciiType,org.apache.cassandra.db.marshal.AsciiType)'
+      end
+
+      it 'should create non-partition key components' do
+        column_family('posts')['column_aliases'].
+          should == %w(month).to_json
+      end
+
+      it 'should set type for non-partition key components' do
+        # This will be a composite consisting of the non-partition key types
+        # followed by UTF-8 for the logical column name
+        column_family('posts')['comparator'].should ==
+          'org.apache.cassandra.db.marshal.CompositeType(org.apache.cassandra.db.marshal.DateType,org.apache.cassandra.db.marshal.UTF8Type)'
+      end
+    end
+
   end
 
   def column_family(name)

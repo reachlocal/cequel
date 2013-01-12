@@ -10,12 +10,11 @@ module Cequel
 
       def initialize(name)
         @name = name
-        @keys = []
         @columns = []
       end
 
-      def add_key(name, type)
-        @columns << Column.new(name, type, true)
+      def add_key(name, type, partition)
+        @columns << Column.new(name, type, true, partition)
       end
 
       def add_column(name, type)
@@ -37,8 +36,21 @@ module Cequel
       end
 
       def keys_cql
-        key_columns = @columns.select { |column| column.key? }
-        "PRIMARY KEY (#{key_columns.map { |key| key.name }.join(', ')})"
+        partition_keys, nonpartition_keys = [], []
+        @columns.each do |column|
+          if column.partition_key? || column.key? && partition_keys.empty?
+            partition_keys << column
+          elsif column.key?
+            nonpartition_keys << column
+          end
+        end
+        partition_cql = partition_keys.map { |key| key.name }.join(', ')
+        if nonpartition_keys.any?
+          nonpartition_cql = nonpartition_keys.map { |key| key.name }.join(', ')
+          "PRIMARY KEY ((#{partition_cql}), #{nonpartition_cql})"
+        else
+          "PRIMARY KEY ((#{partition_cql}))"
+        end
       end
 
     end
