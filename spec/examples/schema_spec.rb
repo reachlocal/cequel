@@ -65,8 +65,8 @@ describe Cequel::Schema do
     describe 'with composite partition key' do
       before do
         cequel.schema.create_table(:posts) do
-          key :blog_subdomain, :ascii, :partition => true
-          key :permalink, :ascii, :partition => true
+          partition_key :blog_subdomain, :ascii
+          partition_key :permalink, :ascii
           column :title, :text
         end
       end
@@ -85,8 +85,8 @@ describe Cequel::Schema do
     describe 'with composite partition key and non-partition keys' do
       before do
         cequel.schema.create_table(:posts) do
-          key :blog_subdomain, :ascii, :partition => true
-          key :permalink, :ascii, :partition => true
+          partition_key :blog_subdomain, :ascii
+          partition_key :permalink, :ascii
           key :month, :timestamp
           column :title, :text
         end

@@ -13,8 +13,12 @@ module Cequel
         @table = table
       end
 
-      def key(name, type, options = {})
-        @table.add_key(name, type, !!options[:partition])
+      def partition_key(name, type)
+        @table.add_partition_key(name, type)
+      end
+
+      def key(name, type)
+        @table.add_key(name, type)
       end
 
       def column(name, type)

@@ -10,11 +10,23 @@ module Cequel
 
       def initialize(name)
         @name = name
-        @columns = []
+        @partition_keys, @nonpartition_keys, @columns = [], [], []
       end
 
-      def add_key(name, type, partition)
-        @columns << Column.new(name, type, true, partition)
+      def add_partition_key(name, type)
+        column = Column.new(name, type)
+        @columns << column
+        @partition_keys << column
+      end
+
+      def add_key(name, type)
+        column = Column.new(name, type)
+        @columns << column
+        if @partition_keys.empty?
+          @partition_keys << column
+        else
+          @nonpartition_keys << column
+        end
       end
 
       def add_column(name, type)
@@ -36,17 +48,10 @@ module Cequel
       end
 
       def keys_cql
-        partition_keys, nonpartition_keys = [], []
-        @columns.each do |column|
-          if column.partition_key? || column.key? && partition_keys.empty?
-            partition_keys << column
-          elsif column.key?
-            nonpartition_keys << column
-          end
-        end
-        partition_cql = partition_keys.map { |key| key.name }.join(', ')
-        if nonpartition_keys.any?
-          nonpartition_cql = nonpartition_keys.map { |key| key.name }.join(', ')
+        partition_cql = @partition_keys.map { |key| key.name }.join(', ')
+        if @nonpartition_keys.any?
+          nonpartition_cql =
+            @nonpartition_keys.map { |key| key.name }.join(', ')
           "PRIMARY KEY ((#{partition_cql}), #{nonpartition_cql})"
         else
           "PRIMARY KEY ((#{partition_cql}))"
