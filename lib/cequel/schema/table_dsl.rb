@@ -17,8 +17,8 @@ module Cequel
         @table.add_partition_key(name, type)
       end
 
-      def key(name, type)
-        @table.add_key(name, type)
+      def key(name, type, clustering_order = nil)
+        @table.add_key(name, type, clustering_order)
       end
 
       def column(name, type)
@@ -39,6 +39,10 @@ module Cequel
 
       def with(name, value)
         @table.add_property(name, value)
+      end
+
+      def compact_storage
+        @table.compact_storage = true
       end
 
     end

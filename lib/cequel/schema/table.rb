@@ -7,11 +7,12 @@ module Cequel
     class Table
 
       attr_reader :name
+      attr_writer :compact_storage
 
       def initialize(name)
         @name = name
-        @partition_keys, @nonpartition_keys, @columns, @properties =
-          [], [], [], []
+        @partition_keys, @nonpartition_keys, @columns, @properties,
+          @clustering_order = [], [], [], [], []
       end
 
       def add_partition_key(name, type)
@@ -20,13 +21,18 @@ module Cequel
         @partition_keys << column
       end
 
-      def add_key(name, type)
+      def add_key(name, type, clustering_order = nil)
         column = Column.new(name, type)
         @columns << column
         if @partition_keys.empty?
+          unless clustering_order.nil?
+            raise ArgumentError,
+              "Can't set clustering order for partition key #{name}"
+          end
           @partition_keys << column
         else
           @nonpartition_keys << column
+          @clustering_order << (clustering_order || :asc)
         end
       end
 
@@ -52,7 +58,8 @@ module Cequel
 
       def create_cql
         "CREATE TABLE #{@name} (#{columns_cql}, #{keys_cql})".tap do |cql|
-          cql << " WITH #{properties_cql}" if @properties.any?
+          properties = properties_cql
+          cql << " WITH #{properties}" if properties
         end
       end
 
@@ -78,7 +85,15 @@ module Cequel
       end
 
       def properties_cql
-        @properties.map { |property| property.to_cql }.join(' AND ')
+        properties_fragments = @properties.map { |property| property.to_cql }
+        properties_fragments << 'COMPACT STORAGE' if @compact_storage
+        if @nonpartition_keys.any?
+          clustering_fragment =
+            @nonpartition_keys.zip(@clustering_order).
+            map { |key, order| "#{key.name} #{order.upcase}" }.join(',')
+          properties_fragments << "CLUSTERING ORDER BY (#{clustering_fragment})"
+        end
+        properties_fragments.join(' AND ') if properties_fragments.any?
       end
 
     end

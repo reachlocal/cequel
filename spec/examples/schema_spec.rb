@@ -167,6 +167,37 @@ describe Cequel::Schema do
       end
     end
 
+    describe 'compact storage' do
+      before do
+        cequel.schema.create_table(:posts) do
+          key :permalink, :ascii
+          column :title, :text
+          compact_storage
+        end
+      end
+
+      it 'should have compact storage' do
+        # without compact storage, it'll be a single-element CompositeType
+        column_family('posts')['comparator'].should ==
+          'org.apache.cassandra.db.marshal.UTF8Type'
+      end
+    end
+
+    describe 'clustering order' do
+      before do
+        cequel.schema.create_table(:posts) do
+          key :blog_permalink, :ascii
+          key :id, :uuid, :desc
+          column :title, :text
+        end
+      end
+
+      it 'should set clustering order' do
+        column_family('posts')['comparator'].should ==
+          'org.apache.cassandra.db.marshal.CompositeType(org.apache.cassandra.db.marshal.ReversedType(org.apache.cassandra.db.marshal.UUIDType),org.apache.cassandra.db.marshal.UTF8Type)'
+      end
+    end
+
   end
 
   def column_family(name)
