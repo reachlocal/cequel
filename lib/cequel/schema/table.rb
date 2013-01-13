@@ -10,7 +10,8 @@ module Cequel
 
       def initialize(name)
         @name = name
-        @partition_keys, @nonpartition_keys, @columns = [], [], []
+        @partition_keys, @nonpartition_keys, @columns, @properties =
+          [], [], [], []
       end
 
       def add_partition_key(name, type)
@@ -45,8 +46,14 @@ module Cequel
         @columns << Map.new(name, key_type, value_type)
       end
 
+      def add_property(name, value)
+        @properties << TableProperty.new(name, value)
+      end
+
       def create_cql
-        "CREATE TABLE #{@name} (#{columns_cql}, #{keys_cql})"
+        "CREATE TABLE #{@name} (#{columns_cql}, #{keys_cql})".tap do |cql|
+          cql << " WITH #{properties_cql}" if @properties.any?
+        end
       end
 
       private
@@ -68,6 +75,10 @@ module Cequel
         else
           "PRIMARY KEY ((#{partition_cql}))"
         end
+      end
+
+      def properties_cql
+        @properties.map { |property| property.to_cql }.join(' AND ')
       end
 
     end

@@ -142,6 +142,31 @@ describe Cequel::Schema do
       end
     end
 
+    describe 'storage properties' do
+      before do
+        cequel.schema.create_table(:posts) do
+          key :permalink, :ascii
+          column :title, :text
+          with :comment, 'Blog posts'
+          with :compression,
+            :sstable_compression => "DeflateCompressor",
+            :chunk_length_kb => 64
+        end
+      end
+
+      it 'should set simple properties' do
+        column_family('posts')['comment'].should == 'Blog posts'
+      end
+
+      it 'should set map collection properties' do
+        column_family('posts')['compression_parameters'].should == {
+          'sstable_compression' =>
+            'org.apache.cassandra.io.compress.DeflateCompressor',
+          'chunk_length_kb' => '64'
+        }.to_json
+      end
+    end
+
   end
 
   def column_family(name)

@@ -37,6 +37,10 @@ module Cequel
         @table.add_map(name, key_type, value_type)
       end
 
+      def with(name, value)
+        @table.add_property(name, value)
+      end
+
     end
 
   end
