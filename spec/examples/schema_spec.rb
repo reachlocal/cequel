@@ -1,6 +1,16 @@
 require File.expand_path('../spec_helper', __FILE__)
 
 describe Cequel::Schema do
+  describe '#read_table' do
+
+    after do
+      cequel.schema.drop_table(:posts)
+    end
+
+    let(:table) { cequel.schema.read_table(:posts) }
+
+  end # describe '#read_table'
+
   describe '#create_table' do
 
     after do
