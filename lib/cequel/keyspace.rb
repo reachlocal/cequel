@@ -99,7 +99,7 @@ module Cequel
     # @param *bind_vars [Object] values for bind variables
     #
     def execute(statement, *bind_vars)
-      logger.debug("DREW: CQL: #{statement}") if self.logger
+      logger.debug("DREW: CQL: #{CassandraCQL::Statement.sanitize(statement, bind_vars)}") if self.logger
       log('CQL', statement, *bind_vars) do
         with_connection do |conn|
           conn.execute(statement, *bind_vars)
