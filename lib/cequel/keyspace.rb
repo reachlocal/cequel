@@ -99,10 +99,21 @@ module Cequel
     # @param *bind_vars [Object] values for bind variables
     #
     def execute(statement, *bind_vars)
-      logger.debug("DREW: CQL: #{CassandraCQL::Statement.sanitize(statement, bind_vars)}") if self.logger
-      log('CQL', statement, *bind_vars) do
-        with_connection do |conn|
-          conn.execute(statement, *bind_vars)
+      begin
+        logger.debug("DREW: CQL: #{CassandraCQL::Statement.sanitize(statement, bind_vars)}") if self.logger
+        log('CQL', statement, *bind_vars) do
+          with_connection do |conn|
+            conn.execute(statement, *bind_vars)
+          end
+        end
+      rescue CassandraCQL::Thrift::Client::TransportException
+        logger.debug("DREW: caught CassandraCQL::Thrift::Client::TransportException, disconnecting and retrying...") if self.logger
+        connection.disconnect!
+        logger.debug("DREW: CQL: #{CassandraCQL::Statement.sanitize(statement, bind_vars)}") if self.logger
+        log('CQL', statement, *bind_vars) do
+          with_connection do |conn|
+            conn.execute(statement, *bind_vars)
+          end
         end
       end
     end
