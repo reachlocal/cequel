@@ -1,3 +1,5 @@
+require 'active_model/mass_assignment_security'
+
 module Cequel
 
   module Model

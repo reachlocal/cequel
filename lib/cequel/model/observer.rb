@@ -1,3 +1,5 @@
+require "rails/observers/active_model/observing"
+
 module Cequel
 
   module Model

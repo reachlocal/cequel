@@ -20,6 +20,8 @@ DESC
   s.required_ruby_version = '>= 1.9'
   s.add_runtime_dependency "activesupport", "~> 4.0.0"
   s.add_runtime_dependency 'activemodel', '~> 4.0.0'
+  s.add_runtime_dependency 'rails-observers'
+  s.add_runtime_dependency 'protected_attributes'
   s.add_runtime_dependency 'cassandra-cql', '~> 1.0'
   s.add_runtime_dependency 'connection_pool', '~> 0.9.2'
   s.add_runtime_dependency 'i18n'
