@@ -59,7 +59,7 @@ module Cequel
 
         def load(*keys)
           keys.flatten!
-          column_family.
+          column_family.consistency(:local_quorum).
             where(key_alias.to_s => keys).
             map { |row| new(row.delete(key_alias.to_s), row) }
         end
@@ -163,7 +163,7 @@ module Cequel
       end
 
       def scope
-        self.class.column_family.where(self.class.key_alias => @key)
+        self.class.column_family.consistency(:local_quorum).where(self.class.key_alias => @key)
       end
 
       def load_raw_slice(columns)
